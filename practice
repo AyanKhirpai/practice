@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage ('poll scm') {
+            steps {
+                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: ', ])
+            }
+        }
+        stage ('build') {
+            steps {
+               sh 'docker build -t 1 .'
+            }
+        }
+        stage ('push to ecr') {
+            steps {
+                sh 'docker push 1'
+            }
+        }
+
+        stage ('deploy docker container') {
+            steps {
+            sh 'kubectl apply -f deployment.yml'
+            sh 'kubectl apply -f service.yml'
+            
+            }  
+        }
+    }
+}
